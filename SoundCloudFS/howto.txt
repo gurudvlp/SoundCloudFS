@@ -1,0 +1,37 @@
+SoundCloudFS
+------------------------------------------------------------------------------------
+
+Usage:
+
+	soundcloudfs <mountpoint> [SEARCH OPTIONS]
+	
+
+Options:
+
+	filenameformat		fnf
+	Examples:
+		soundcloudfs mountpoint filenameformat=[TRACKTITLE]
+		soundcloudfs mountpoint filenameformat="[USERNAME] - [TRACKTITLE]"
+		soundcloudfs mountpoint filenameformat="[GENRE] - [USERNAME] - [TRACKTITLE]"
+	
+	Filters:
+		[TRACKTITLE]
+		[USERID]
+		[USERNAME]
+		[GENRE]
+		
+	-----
+	
+	byuser
+	Examples:
+		soundcloudfs mountpoint byuser='goblichaun'
+		soundcloudfs mountpoint byuser='goblichaun' filenameformat="[USERNAME] - [TRACKTITLE]"
+		
+	-----
+	
+	decay
+	Examples:
+		soundcloudfs mountpoint decay=3600
+		soundcloudfs mountpoint decay=nodecay
+		soundcloudfs mountpoint nodecay
+		soundcloudfs mountpoint decay=3600 q[genre]='drumstep'

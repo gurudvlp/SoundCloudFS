@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{75A3564A-2764-4ABE-8FFF-872F43D7346A}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SoundCloudFS</RootNamespace>
+    <AssemblyName>SoundCloudFS</AssemblyName>
+    <ReleaseVersion>0.12.04.29</ReleaseVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <Externalconsole>true</Externalconsole>
+    <Commandlineparameters>/home/guru/mnt/soundcloud q[genre]='drumstep'</Commandlineparameters>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <Externalconsole>true</Externalconsole>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Mono.Fuse">
+      <HintPath>..\..\SoundCloudFS-og\Mono.Fuse.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Data" />
+    <Reference Include="Mono.Posix" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Scrapers\BinaryChunks.cs" />
+    <Compile Include="Scrapers\Scraper.cs" />
+    <Compile Include="Scrapers\SoundCloudSearch.cs" />
+    <Compile Include="Scrapers\StreamHeaders.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="FS.cs" />
+    <Compile Include="Logging.cs" />
+    <Compile Include="Track.cs" />
+    <Compile Include="User.cs" />
+    <Compile Include="Main.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Scrapers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="howto.txt" />
+  </ItemGroup>
+</Project>
