@@ -250,6 +250,7 @@ namespace btEngine
 					return;*/
 				//fs.MountAt ("path" /* , args? */);
 				
+				//fs.FuseOptions.Add
 				if(Engine.Config.MountPoint == null || Engine.Config.MountPoint == "") { fs.MountPoint = args[0]; }
 				else { fs.MountPoint = Engine.Config.MountPoint; }
 				if(fs.MountPoint.LastIndexOf("/") == fs.MountPoint.Length - 1) { fs.MountPoint = fs.MountPoint.Substring(0, fs.MountPoint.Length - 1); }

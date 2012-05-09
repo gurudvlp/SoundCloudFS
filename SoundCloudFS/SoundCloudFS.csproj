@@ -21,7 +21,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <Externalconsole>true</Externalconsole>
-    <Commandlineparameters>/home/guru/mnt/soundcloud q[genre]='drumstep'</Commandlineparameters>
+    <Commandlineparameters>/home/guru/mnt/soundcloud q[genre]='jump+up'</Commandlineparameters>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
@@ -35,7 +35,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Mono.Fuse">
-      <HintPath>..\..\SoundCloudFS-og\Mono.Fuse.dll</HintPath>
+      <HintPath>..\Mono.Fuse.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Data" />
