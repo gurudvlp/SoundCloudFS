@@ -135,7 +135,7 @@ namespace SoundCloudFS
 			sth.TakeTurn();
 			
 			string templocation = sth.response.GetResponseHeader("Location");
-			Logging.Write("Stream Retrieval redirecting to " + templocation);
+			//Logging.Write("Stream Retrieval redirecting to " + templocation);
 			sth = new btEngine.Scrapers.StreamHeaders();
 			sth.FollowRedirects = false;
 			sth.ScrapeURL = templocation;
@@ -147,7 +147,7 @@ namespace SoundCloudFS
 			this.RawData = sth.GetStreamBytes();
 			this.Retrieved = true;
 			
-			Logging.Write("Track: " + this.Title + " retrieved and ready for usage.");
+			//Logging.Write("Track: " + this.Title + " retrieved and ready for usage.");
 			sth = null;
 			
 			return true;

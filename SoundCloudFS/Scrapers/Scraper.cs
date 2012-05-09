@@ -49,21 +49,36 @@ namespace btEngine.Scrapers
 		
 		public virtual string RipPage(string Method, string Url)
 		{
+			//Logging.Write("BaseScraper:RipPage:Url: " + Url);
 			// prepare the web page we will be asking for
-			HttpWebRequest  request  = (HttpWebRequest)WebRequest.Create(Url);
+			HttpWebRequest  request;
+			
+			try
+			{
+				request = (HttpWebRequest)WebRequest.Create(Url);
 			
 	
-			// execute the request
-			request.AllowAutoRedirect = true;
-			request.Method = Method;
-			request.UserAgent = this.UserAgent;
-			request.CookieContainer = this.Cookies;
-			
-			if(FollowRedirects) { request.AllowAutoRedirect = true; request.MaximumAutomaticRedirections = MaxRedirects; } else { request.AllowAutoRedirect = false; }
-			if(LimitRange && !(LimitRangeUpper < LimitRangeLower)) { request.AddRange(LimitRangeLower, LimitRangeUpper); }
-			
-			//Logging.Write("btEngine: Scrapers: Cookie Count: " + request.CookieContainer.Count.ToString());
-			
+				// execute the request
+				request.AllowAutoRedirect = true;
+				request.Method = Method;
+				request.UserAgent = this.UserAgent;
+				request.CookieContainer = this.Cookies;
+				
+				if(FollowRedirects) { request.AllowAutoRedirect = true; request.MaximumAutomaticRedirections = MaxRedirects; } else { request.AllowAutoRedirect = false; }
+				if(LimitRange && !(LimitRangeUpper < LimitRangeLower)) { request.AddRange(LimitRangeLower, LimitRangeUpper); }
+				
+				//Logging.Write("btEngine: Scrapers: Cookie Count: " + request.CookieContainer.Count.ToString());
+			}
+			catch(Exception ex)
+			{
+				Logging.Write("A fatal error occurred while ripping the page:");
+				Logging.Write(Method + " " + Url);
+				Logging.Write("-----");
+				Logging.Write(ex.Message);
+				Logging.Write(ex.StackTrace);
+				//Logging.Write(ex.InnerException.StackTrace);
+				Environment.Exit(0);
+			}
 			
 			
 			
@@ -71,7 +86,11 @@ namespace btEngine.Scrapers
 			{
 				response = (HttpWebResponse)request.GetResponse();
 		
-				if(GetStreamAtRip) { return GetStreamAscii(); }
+				if(GetStreamAtRip)
+				{
+					//Logging.Write("BaseScraper:RipPage:GetStreamAtRip");
+					return GetStreamAscii(); 
+				}
 				
 			}
 			catch(Exception ex)

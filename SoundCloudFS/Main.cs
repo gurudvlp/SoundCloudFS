@@ -240,6 +240,7 @@ namespace btEngine
 						System.IO.File.Delete("tmpresult.xml");
 						
 						SearchParameters = SearchParameters + "&user_id=" + tmpuser.ID.ToString();
+						Logging.Write("SearchParams: " + SearchParameters);
 					}
 				}
 			}
@@ -250,6 +251,7 @@ namespace btEngine
 				string SearchURL = btEngine.Engine.Config.BaseSearchURL.Replace("[SEARCHPARAMETERS]", SearchParameters);
 				Scrapers.SoundCloudSearch SearchScrape = new Scrapers.SoundCloudSearch();
 				SearchScrape.ScrapeURL = SearchURL;
+				//Logging.Write("Scrape/SearchURL: " + SearchScrape.ScrapeURL);
 				SearchScrape.Name = "SoundCloudScraper";
 				SearchScrape.SourceName = "SoundCloud";
 				
@@ -276,7 +278,16 @@ namespace btEngine
 							tr.Close();
 							System.IO.File.Delete("tmpresult.xml");
 							
-							Tracks[etrack].CalculateFilesize();
+							if(Tracks[etrack].StreamURL == null || Tracks[etrack].StreamURL == "")
+							{
+								Logging.Write("A track without a stream URL was found!");
+								Logging.Write("It is " + Tracks[etrack].Title + " by " + Tracks[etrack].UserID.ToString());
+								Tracks[etrack] = null;
+							}
+							else
+							{
+								Tracks[etrack].CalculateFilesize();
+							}
 						}
 					}
 					

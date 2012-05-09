@@ -23,6 +23,7 @@ namespace btEngine.Scrapers
 		
 		public override bool TakeTurn ()
 		{
+			//Logging.Write("Inside SoundCloudSearch Scraper TakeTurn() " + ScrapeURL);
 			if(this.ScrapeURL == null || this.ScrapeURL == "")
 			{
 				Logging.Write("SoundCloudSearch: No URL was specified to scrape.");
