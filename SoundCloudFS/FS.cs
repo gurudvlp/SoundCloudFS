@@ -62,7 +62,8 @@ namespace Mono.Fuse.SoundCloud {
 		//protected override Errno OnGetPathStatus (string path, ref Stat stbuf)
 		protected override Errno OnGetPathStatus (string path, out Stat stbuf)
 		{
-			Trace.WriteLine ("(OnGetPathStatus {0})", path);
+			Logging.Write("(OnGetPathStatus " + path + ")");
+			//Trace.WriteLine ("(OnGetPathStatus {0})", path);
 
 			stbuf = new Stat ();
 			//Logging.Write("OnGetPathStatus: Path: " + path);
@@ -71,6 +72,10 @@ namespace Mono.Fuse.SoundCloud {
 				stbuf.st_mode = FilePermissions.S_IFDIR |
 					NativeConvert.FromOctalPermissionString("0755");
 				stbuf.st_nlink = 2;
+				stbuf.st_gid = (uint)Engine.Config.GroupID;
+				stbuf.st_uid = (uint)Engine.Config.UserID;
+				stbuf.st_size = 4096;
+				
 				return 0;
 			}
 			else
@@ -85,6 +90,20 @@ namespace Mono.Fuse.SoundCloud {
 						stbuf.st_nlink = 1;
 						int size = Engine.Tracks[etrack].Filesize;
 						stbuf.st_size = size;
+						
+						//stbuf.st_ctime = Engine.Tracks[etrack].UnixTimeCreated();
+						//stbuf.st_atime = Engine.Tracks[etrack].UnixTimeAccessed();
+						//stbuf.st_mtime = Engine.Tracks[etrack].UnixTimeCreated();
+						long unixtimecreated = Engine.Tracks[etrack].UnixTimeCreated();
+						//Logging.Write("Created Time: " + unixtimecreated.ToString() + " " + Engine.Tracks[etrack].CreatedAt);
+						stbuf.st_ctime = unixtimecreated;
+						stbuf.st_mtime = unixtimecreated;
+						stbuf.st_atime = Engine.Tracks[etrack].UnixTimeAccessed();
+						
+						stbuf.st_gid = (uint)Engine.Config.GroupID;
+						stbuf.st_uid = (uint)Engine.Config.UserID;
+						
+						
 						return 0;
 					}
 				}
@@ -124,7 +143,7 @@ namespace Mono.Fuse.SoundCloud {
 			paths = null;
 			if (path != "/")
 				return Errno.ENOENT;
-
+			
 			paths = GetEntries ();
 			return 0;
 		}
@@ -136,7 +155,23 @@ namespace Mono.Fuse.SoundCloud {
 			
 			for(int etrack = 0; etrack < Engine.Tracks.Length; etrack++)
 			{
-				if(Engine.Tracks[etrack] != null) { yield return new DirectoryEntry(Engine.Tracks[etrack].Filename); }
+				if(Engine.Tracks[etrack] != null)
+				{
+					Logging.Write("Getting entry for track " + etrack.ToString());
+					DirectoryEntry de = new DirectoryEntry(Engine.Tracks[etrack].Filename);
+					//de.Stat.st_atime = Engine.Tracks[etrack].UnixTimeAccessed();
+					//de.Stat.st_ctime = Engine.Tracks[etrack].UnixTimeCreated();
+					//de.Stat.st_mtime = Engine.Tracks[etrack].UnixTimeCreated();
+					//de.Stat.st_gid = (uint)Engine.Config.GroupID;
+					//de.Stat.st_uid = (uint)Engine.Config.UserID;
+					//de.Stat.st_uid = (uint)1000;
+					//de.Stat.st_mode = FilePermissions.S_IFREG |
+					//		NativeConvert.FromOctalPermissionString("0644");
+					//de.Stat.st_nlink = 1;
+					//de.Stat.st_size = Engine.Tracks[etrack].Filesize;
+					
+					yield return de;
+				}
 			}
 			
 		}
@@ -159,7 +194,7 @@ namespace Mono.Fuse.SoundCloud {
 				{
 					if("/" + Engine.Tracks[etrack].Filename == path)
 					{
-						
+						Engine.Tracks[etrack].Touch();
 						return 0;
 					}
 				}
@@ -186,6 +221,8 @@ namespace Mono.Fuse.SoundCloud {
 			{
 				if(Engine.Tracks[etrack] != null && path == "/" + Engine.Tracks[etrack].Filename)
 				{
+					Engine.Tracks[etrack].Touch();
+					
 					if(!Engine.Tracks[etrack].Retrieved) 
 					{
 						
@@ -237,11 +274,15 @@ namespace Mono.Fuse.SoundCloud {
 
 		protected override Errno OnGetPathExtendedAttribute (string path, string name, byte[] value, out int bytesWritten)
 		{
-			Console.WriteLine ("(OnGetPathExtendedAttribute {0})", path);
+			Console.WriteLine ("(OnGetPathExtendedAttribute {0}, {1}, {2})", path, name, value);
 			bytesWritten = 0;
-			if (path != hello_path) {
+			if(path != "TODOFIXTHIS")
+			{
 				return 0;
 			}
+			/*if (path != hello_path) {
+				return 0;
+			}*/
 			byte[] _value;
 			lock (hello_attrs) {
 				if (!hello_attrs.ContainsKey (name))
@@ -254,6 +295,7 @@ namespace Mono.Fuse.SoundCloud {
 			Array.Copy (_value, value, _value.Length);
 			bytesWritten = _value.Length;
 			return 0;
+			
 		}
 
 		protected override Errno OnSetPathExtendedAttribute (string path, string name, byte[] value, XattrFlags flags)

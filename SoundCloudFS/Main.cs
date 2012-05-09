@@ -11,7 +11,7 @@ namespace btEngine
 	class Engine
 	{
 		public static string EngineName = "SoundCloudFS";
-		public static string EngineVersion = "v0.12.02.07";
+		public static string EngineVersion = "v0.12.05.09";
 		public static SoundCloudFS.Config Config = new SoundCloudFS.Config();
 		//public static bool DisplayDebug = true;
 		public static Dictionary<string, string> Filters = new Dictionary<string, string>();
@@ -85,6 +85,8 @@ namespace btEngine
 				}
 			}
 			
+			
+			
 			foreach(string earg in args)
 			{
 				if(Config.MountPoint == "") { Config.MountPoint = earg; }
@@ -125,6 +127,34 @@ namespace btEngine
 								}
 							}
 						}
+						else if(parts[0].ToLower() == "mountuid"
+						        || parts[0].ToLower() == "uid")
+						{
+							int tuid = 0;
+							if(Int32.TryParse(parts[1], out tuid))
+							{
+								Engine.Config.UserID = tuid;
+							}
+						}
+						else if(parts[0].ToLower() == "mountgid"
+						        || parts[0].ToLower() == "gid")
+						{
+							int tgid = 0;
+							if(Int32.TryParse(parts[1], out tgid))
+							{
+								Engine.Config.GroupID = tgid;
+							}
+						}
+						else if(parts[0].ToLower() == "mountuser"
+						        || parts[0].ToLower() == "uname")
+						{
+							Engine.Config.MountAsUser = parts[1];
+						}
+						else if(parts[0].ToLower() == "mountgroup"
+						        || parts[0].ToLower() == "gname")
+						{
+							Engine.Config.MountAsGroup = parts[1];
+						}
 						else
 						{
 							Filters.Add(parts[0], parts[1]);
@@ -150,12 +180,27 @@ namespace btEngine
 								SearchParameters = SearchParameters + "&" + parts[0] + "=" + parts[1];
 							}
 						}
+						
 					}
 					else
 					{
 						if(earg.ToLower() == "nodecay")
 						{
 							Engine.Config.DecayTime = -1;
+						}
+						else if(earg.ToLower() == "allowother"
+						        || earg.ToLower() == "allowothers"
+						        || earg.ToLower() == "allow_other"
+						        || earg.ToLower() == "allow_others")
+						{
+							Engine.Config.AllowOthers = true;
+						}
+						else if(earg.ToLower() == "noother"
+						        || earg.ToLower() == "noothers"
+						        || earg.ToLower() == "no_other"
+						        || earg.ToLower() == "no_others")
+						{
+							Engine.Config.AllowOthers = false;
 						}
 					}
 					
@@ -251,6 +296,13 @@ namespace btEngine
 				//fs.MountAt ("path" /* , args? */);
 				
 				//fs.FuseOptions.Add
+				
+				if(Engine.Config.AllowOthers)
+				{
+					string[] fuseopts = new string[]{"-o", "allow_other"};
+					string[] unhandled = fs.ParseFuseArguments(fuseopts);
+				}
+				
 				if(Engine.Config.MountPoint == null || Engine.Config.MountPoint == "") { fs.MountPoint = args[0]; }
 				else { fs.MountPoint = Engine.Config.MountPoint; }
 				if(fs.MountPoint.LastIndexOf("/") == fs.MountPoint.Length - 1) { fs.MountPoint = fs.MountPoint.Substring(0, fs.MountPoint.Length - 1); }

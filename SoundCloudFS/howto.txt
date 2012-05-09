@@ -35,3 +35,28 @@ Options:
 		soundcloudfs mountpoint decay=nodecay
 		soundcloudfs mountpoint nodecay
 		soundcloudfs mountpoint decay=3600 q[genre]='drumstep'
+
+	-----
+	
+	User and Group (By ID):
+	
+	mountuid	uid
+	mountgid	gid
+	Examples:
+		soundcloudfs mountpoint uid=1000 fnf="[USERNAME] - [TRACKTITLE]" q[genre]='drumstep'
+		soundcloudfs mountpoint uid=1000 gid=1000 q[genre]='drumstep'
+	
+	User and Group (By Name):
+	
+	mountuser	uname
+	mountgroup	gname
+	Examples:
+		soundcloudfs mountpoint mountuser=guru mountgroup=guru fnf="[USERNAME] - [TRACKTITLE]" q[genre]='drumstep'
+	
+	-----
+	
+	Sharing mounts with other users:
+	
+	allowother	allow_other
+	Examples:
+		soundcloudfs mountpoint mountuser=guru mountgroup=guru allow_other fnf="[USERNAME] - [TRACKTITLE]" q[genre]='drumstep' limit=200

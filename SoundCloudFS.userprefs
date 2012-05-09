@@ -1,17 +1,15 @@
 ﻿<Properties>
   <AuthorInfo Name="Brian Murphy" Email="gurudvlp@gmail.com" Copyright="Brian Murphy" Company="Guru Digital Solutions" Trademark="" />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="SoundCloudFS/FS.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="SoundCloudFS/Track.cs">
     <Files>
       <File FileName="SoundCloudFS/Scrapers/Scraper.cs" Line="1" Column="1" />
-      <File FileName="SoundCloudFS/Main.cs" Line="256" Column="5" />
-      <File FileName="SoundCloudFS/FS.cs" Line="88" Column="7" />
-      <File FileName="SoundCloudFS/Track.cs" Line="1" Column="1" />
+      <File FileName="SoundCloudFS/Main.cs" Line="263" Column="3" />
+      <File FileName="SoundCloudFS/FS.cs" Line="97" Column="7" />
+      <File FileName="SoundCloudFS/Track.cs" Line="180" Column="46" />
       <File FileName="SoundCloudFS/User.cs" Line="1" Column="1" />
-      <File FileName="SoundCloudFS/Config.cs" Line="28" Column="4" />
-      <File FileName="SoundCloudFS/Main.cs" Line="1" Column="1" />
+      <File FileName="SoundCloudFS/Config.cs" Line="66" Column="7" />
       <File FileName="SoundCloudFS/Scrapers/Scraper.cs" Line="1" Column="1" />
-      <File FileName="SoundCloudFS/FS.cs" Line="1" Column="1" />
       <File FileName="SoundCloudFS/howto.txt" Line="1" Column="1" />
     </Files>
     <Pads>
@@ -19,6 +17,7 @@
         <State expanded="True">
           <Node name="SoundCloudFS" expanded="True" selected="True">
             <Node name="References" expanded="True" />
+            <Node name="Scrapers" expanded="True" />
           </Node>
         </State>
       </Pad>

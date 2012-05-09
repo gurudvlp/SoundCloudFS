@@ -58,6 +58,9 @@ namespace SoundCloudFS
 		[XmlIgnore()] public bool RetrievalStarted = false;
 		[XmlIgnore()] public int BytesRetrieved = 0;
 		
+		[XmlIgnoreAttribute()] private long TimeCreated = 0;
+		[XmlIgnoreAttribute()] private long TimeAccessed = 0;
+		
 		public Track ()
 		{
 		}
@@ -148,6 +151,55 @@ namespace SoundCloudFS
 			sth = null;
 			
 			return true;
+		}
+		
+		public long UnixTimeCreated()
+		{
+			try
+			{
+				if(TimeCreated > 0) { return TimeCreated; }
+				
+				string tmpat = this.CreatedAt;
+				if(tmpat == null || tmpat == "" || tmpat == "null")
+				{
+					TimeCreated = (long)(DateTime.UtcNow - new DateTime(1970, 1,1,0,0,0)).TotalSeconds;
+					return TimeCreated;
+				}
+				
+				//	SoundCloud returns a date sort of like:
+				//		2011/01/08 01:01:25 +0000
+				//tmpat = tmpat.Substring(0, tmpat.Length - 5).Trim();
+				int year = Int32.Parse(tmpat.Substring(0, 4));
+				int month = Int32.Parse(tmpat.Substring(5, 2));
+				int day = Int32.Parse(tmpat.Substring(8, 2));
+				int hour = Int32.Parse(tmpat.Substring(11, 2));
+				int minute = Int32.Parse(tmpat.Substring(14, 2));
+				int second = Int32.Parse(tmpat.Substring(17, 2));
+				
+				DateTime whenat = new DateTime(year, month, day, hour, minute, second);
+				TimeCreated = (long)(whenat - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
+				
+				//TimeCreated = (new DateTime(year, month, day, hour, minute, second).TotalSeconds) - (new DateTime(1970, 1, 1, 0, 0, 0).TotalSeconds);
+			}
+			catch(Exception ex)
+			{
+				Logging.Write("Exception figuring out the UnixTimeCreated from " + this.CreatedAt);
+				Logging.Write(ex.Message);
+			}
+			
+			return TimeCreated;
+		}
+		
+		public long UnixTimeAccessed()
+		{
+			if(TimeAccessed > 0) { return TimeAccessed; }
+			TimeAccessed = UnixTimeCreated();
+			return TimeAccessed;
+		}
+		
+		public void Touch()
+		{
+			TimeAccessed = (long)(DateTime.UtcNow - new DateTime(1970, 1,1,0,0,0)).TotalSeconds;
 		}
 	}
 }
