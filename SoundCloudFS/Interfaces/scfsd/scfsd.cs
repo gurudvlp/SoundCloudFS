@@ -83,7 +83,12 @@ namespace btEngine
 					if(SoundCloudFS.FileTree.Node.SaveNodes()) { base.OutgoingBuffer = "OK\n"; }
 					else { base.OutgoingBuffer = "FAIL Path Nodes failed to save."; }
 				}
-				else if(CurrentCommand == "quit" || CurrentCommand == "exit")
+				else if(CurrentCommand == "exit")
+				{
+					
+					base.TerminateAfterSend = true;
+				}
+				else if(CurrentCommand == "quit")
 				{
 					base.OutgoingBuffer = "BYE\n";
 					base.TerminateAfterSend = true;
@@ -117,6 +122,53 @@ namespace btEngine
 					}
 					
 					base.OutgoingBuffer = base.OutgoingBuffer + "\n";
+				}
+				else if(CurrentCommand == "lsgenres")
+				{
+					int nodeid = SoundCloudFS.FileTree.Node.FindNode(CurrentDir);
+					if(Engine.FSNodes[nodeid].NodeType == SoundCloudFS.FileTree.Node.NodeTypeTree)
+					{
+						base.OutgoingBuffer = "FAIL Node is a tree, not a search.\n";
+					}
+					else
+					{
+						if(Engine.FSNodes[nodeid].QueryGenres == null)
+						{
+							base.OutgoingBuffer = "FAIL Genre list is null.\n";
+						}
+						else
+						{
+							for(int eg = 0; eg < Engine.FSNodes[nodeid].QueryGenres.Length; eg++)
+							{
+								base.OutgoingBuffer = base.OutgoingBuffer + Engine.FSNodes[nodeid].QueryGenres[eg] + "\n";
+							}
+							base.OutgoingBuffer = base.OutgoingBuffer + "\n";
+						}
+					}
+				}
+				else if(CurrentCommand == "lslimit")
+				{
+					int nodeid = SoundCloudFS.FileTree.Node.FindNode(CurrentDir);
+					if(Engine.FSNodes[nodeid].NodeType == SoundCloudFS.FileTree.Node.NodeTypeTree)
+					{
+						base.OutgoingBuffer = "FAIL Node is a tree, not a search.\n";
+					}
+					else
+					{
+						base.OutgoingBuffer = Engine.FSNodes[nodeid].QueryLimit.ToString() + "\n";
+					}
+				}
+				else if(CurrentCommand == "lsoffset")
+				{
+					int nodeid = SoundCloudFS.FileTree.Node.FindNode(CurrentDir);
+					if(Engine.FSNodes[nodeid].NodeType == SoundCloudFS.FileTree.Node.NodeTypeTree)
+					{
+						base.OutgoingBuffer = "FAIL Node is a tree, not a search.\n";
+					}
+					else
+					{
+						base.OutgoingBuffer = Engine.FSNodes[nodeid].QueryOffset.ToString() + "\n";
+					}
 				}
 				
 				if(CurrentCommand.Contains(" "))
@@ -166,6 +218,14 @@ namespace btEngine
 							for(int ep = 0; ep < genres.Length; ep++)
 							{
 								genres[ep] = genres[ep].Trim();
+								if(genres[ep].Contains(" "))
+								{
+									genres[ep] = genres[ep].Substring(0, genres[ep].IndexOf(" ") - 1);
+								}
+								if(genres[ep].Contains("'"))
+								{
+									genres[ep] = genres[ep].Substring(0, genres[ep].IndexOf("'") - 1);
+								}
 								
 							}
 							
@@ -187,6 +247,44 @@ namespace btEngine
 						}
 						
 						base.OutgoingBuffer = "OK\n";
+					}
+					else if(cmdparts[0] == "autosavenodes")
+					{
+						if(cmdparts[1] == "true"
+						   || cmdparts[1] == "1"
+						   || cmdparts[1] == "yes")
+						{
+							Engine.Config.AutoSaveNodes = true;
+							base.OutgoingBuffer = "OK\n";
+						}
+						else if(cmdparts[1] == "false"
+						        || cmdparts[1] == "0"
+						        || cmdparts[1] == "no")
+						{
+							Engine.Config.AutoSaveNodes = false;
+							base.OutgoingBuffer = "OK\n";
+						}
+						else
+						{
+							base.OutgoingBuffer = "FAIL Command expected as autosavenodes true/false.\n";
+						}
+					}
+					else if(cmdparts[0] == "decay")
+					{
+						string decaytime = cmdparts[1];
+						if(decaytime == "nodecay") { decaytime = "-1"; }
+						
+						int dtime = 0;
+						if(Int32.TryParse(decaytime, out dtime))
+						{
+							if(dtime < 0) { dtime = -1; }
+							Engine.Config.DecayTime = dtime;
+							base.OutgoingBuffer = "OK\n";
+						}
+						else
+						{
+							base.OutgoingBuffer = "FAIL Expected an integer or nodecay.\n";
+						}
 					}
 				}
 			}

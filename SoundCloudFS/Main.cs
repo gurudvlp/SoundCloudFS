@@ -373,14 +373,14 @@ namespace btEngine
 					}
 				}
 				
-				Thread.Sleep(0);
+				//Thread.Sleep(0);
 				
 				endtime = (TimeStamp() * 1000) + System.DateTime.Now.Millisecond;
 				cycletime = endtime - starttime;
 				//totalcycletime = totalcycletime + cycletime;
 				//totalcycles++;
 				
-				Thread.Sleep(0);
+				Thread.Sleep(1);
 				//	End of Daemon Heart Loop
 			}
 		}
