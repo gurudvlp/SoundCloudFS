@@ -5,11 +5,12 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{75A3564A-2764-4ABE-8FFF-872F43D7346A}</ProjectGuid>
+    <ProjectGuid>{1E387BAD-0232-43DF-AE00-AE35CF3B693E}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SoundCloudFS</RootNamespace>
-    <AssemblyName>SoundCloudFS</AssemblyName>
+    <RootNamespace>scfscli</RootNamespace>
+    <AssemblyName>scfs-cli</AssemblyName>
     <ReleaseVersion>0.12.09.03</ReleaseVersion>
+    <Description>Control the SoundCloudFS Daemon via the command line.</Description>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <Externalconsole>true</Externalconsole>
-    <Commandlineparameters>t tags='jump,up,dnb,drum,bass,dubstep' limit=100</Commandlineparameters>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
@@ -34,42 +34,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Mono.Fuse">
-      <HintPath>..\Mono.Fuse.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml" />
-    <Reference Include="System.Data" />
-    <Reference Include="Mono.Posix" />
+    <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Scrapers\BinaryChunks.cs" />
-    <Compile Include="Scrapers\Scraper.cs" />
-    <Compile Include="Scrapers\SoundCloudSearch.cs" />
-    <Compile Include="Scrapers\StreamHeaders.cs" />
-    <Compile Include="FS.cs" />
-    <Compile Include="Logging.cs" />
-    <Compile Include="Track.cs" />
-    <Compile Include="User.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Connector.cs" />
     <Compile Include="Config\Config.cs" />
-    <Compile Include="Config\Daemon.cs" />
-    <Compile Include="FileTree\Node.cs" />
-    <Compile Include="Connections\Connections.cs" />
-    <Compile Include="Connections\Listeners.cs" />
-    <Compile Include="Interfaces\Interface.cs" />
-    <Compile Include="Interfaces\scfsd\scfsd.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Folder Include="Scrapers\" />
     <Folder Include="Config\" />
-    <Folder Include="FileTree\" />
-    <Folder Include="Connections\" />
-    <Folder Include="Interfaces\" />
-    <Folder Include="Interfaces\scfsd\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="howto.txt" />
   </ItemGroup>
 </Project>

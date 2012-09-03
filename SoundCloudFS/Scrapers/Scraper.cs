@@ -143,18 +143,18 @@ namespace btEngine.Scrapers
 		
 		public byte[] GetStreamBytes(bool DisposeAtEnd)
 		{
-			Logging.Write("Getting stream bytes for scraper.");
+			//Logging.Write("Getting stream bytes for scraper.");
 			
 			List<BinaryChunks> BufferList = new List<BinaryChunks>();
 			int ttlcount = 0;
 			resStream = response.GetResponseStream();
 			int count = 0;
 			int timesaround = 0;
-			Logging.Write("Entering stream byte loop");
+			//Logging.Write("Entering stream byte loop");
 			do
 			{
 				// fill the buffer with data
-				Logging.Write("Reading buffer");
+				//Logging.Write("Reading buffer");
 				byte[] buf = new byte[8192];
 				count = resStream.Read(buf, 0, buf.Length);
 	
@@ -188,7 +188,7 @@ namespace btEngine.Scrapers
 						//System.IO.File.WriteAllBytes("/home/guru/test.mp3", this.RawBinary);
 						Logging.Write("End of data being in buffer");*/
 						//Logging.Write("Adding " + count.ToString() + " bytes to buffer. (" + (ttlcount + count).ToString() + " total)");
-						Logging.Write("Retrieved " + (ttlcount + count).ToString() + "/" + this.KnownMaxLength.ToString() + " bytes.");
+						//Logging.Write("Retrieved " + (ttlcount + count).ToString() + "/" + this.KnownMaxLength.ToString() + " bytes.");
 						BinaryChunks binch = new BinaryChunks();
 						binch.BinBytes = buf;
 						binch.ByteLength = count;

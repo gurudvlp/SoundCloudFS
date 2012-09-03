@@ -40,18 +40,13 @@ using Mono.Unix.Native;
 using btEngine;
 
 namespace Mono.Fuse.SoundCloud {
-	class SoundCloudFS : Mono.Fuse.FileSystem 
+	class FS : Mono.Fuse.FileSystem 
 	{
-		const string hello_path = "/hello";
-		const string data_path  = "/data";
-		const string data_im_path  = "/data.im";
-
-		const int data_size = 100000000;
 
 		Dictionary<string, byte[]> hello_attrs = new Dictionary<string, byte[]>();
 		
 		
-		public SoundCloudFS ()
+		public FS ()
 		{
 			Logging.Write(Engine.EngineName + " " + Engine.EngineVersion);
 			//hello_attrs ["foo"] = Encoding.UTF8.GetBytes ("bar");
@@ -62,43 +57,78 @@ namespace Mono.Fuse.SoundCloud {
 		//protected override Errno OnGetPathStatus (string path, ref Stat stbuf)
 		protected override Errno OnGetPathStatus (string path, out Stat stbuf)
 		{
-			Logging.Write("(OnGetPathStatus " + path + ")");
-			//Trace.WriteLine ("(OnGetPathStatus {0})", path);
-
-			stbuf = new Stat ();
-			//Logging.Write("OnGetPathStatus: Path: " + path);
-			if(path == "/")
+			try
 			{
-				stbuf.st_mode = FilePermissions.S_IFDIR |
-					NativeConvert.FromOctalPermissionString("0755");
-				stbuf.st_nlink = 2;
-				stbuf.st_gid = (uint)Engine.Config.GroupID;
-				stbuf.st_uid = (uint)Engine.Config.UserID;
-				stbuf.st_size = 4096;
-				
-				return 0;
-			}
-			else
-			{
-				for(int etrack = 0; etrack < Engine.Tracks.Length; etrack++)
+				Logging.Write("(OnGetPathStatus " + path + ")");
+				//Trace.WriteLine ("(OnGetPathStatus {0})", path);
+	
+				stbuf = new Stat ();
+				//Logging.Write("OnGetPathStatus: Path: " + path);
+				if(path == "/")
 				{
-					if(Engine.Tracks[etrack] != null && path == "/" + Engine.Tracks[etrack].Filename)
+					stbuf.st_mode = FilePermissions.S_IFDIR |
+						NativeConvert.FromOctalPermissionString("0755");
+					stbuf.st_nlink = 2;
+					stbuf.st_gid = (uint)Engine.Config.GroupID;
+					stbuf.st_uid = (uint)Engine.Config.UserID;
+					stbuf.st_size = 4096;
+					
+					return 0;
+				}
+				
+				
+				string trackfilename = SoundCloudFS.FileTree.Node.ParseTrackFilename(path);
+				string nodepath = SoundCloudFS.FileTree.Node.ParseNodeName(path);
+				
+				//Logging.Write("OnGetPathStatus: nodepath: " + nodepath);
+				//Logging.Write("OnGetPathStatus: trackfilename: " + trackfilename);
+				
+				int nodeid = SoundCloudFS.FileTree.Node.FindNode(nodepath);
+				if(nodeid < 0)
+				{
+					//Logging.Write("Path not found!");
+					return Errno.ENOENT;
+				}
+				
+				//Logging.Write("Path Found, nodeid: " + nodeid.ToString());
+				
+				if(trackfilename == "")
+				{
+					//Logging.Write("trackfilename == blank");
+					stbuf.st_mode = FilePermissions.S_IFDIR |
+						NativeConvert.FromOctalPermissionString("0755");
+					stbuf.st_nlink = 2;
+					stbuf.st_gid = (uint)Engine.Config.GroupID;
+					stbuf.st_uid = (uint)Engine.Config.UserID;
+					stbuf.st_size = 4096;
+					
+					return 0;
+				}
+				
+				
+				
+				//Logging.Write("track filename specified.");
+				if(Engine.FSNodes[nodeid].Tracks == null) { return Errno.ENOENT; }
+				for(int etrack = 0; etrack < Engine.FSNodes[nodeid].Tracks.Length; etrack++)
+				{
+					if(Engine.FSNodes[nodeid].Tracks[etrack] != null
+					   && trackfilename == Engine.FSNodes[nodeid].Tracks[etrack].Filename)
 					{
-						
 						stbuf.st_mode = FilePermissions.S_IFREG |
 							NativeConvert.FromOctalPermissionString("0644");
 						stbuf.st_nlink = 1;
-						int size = Engine.Tracks[etrack].Filesize;
+						int size = Engine.FSNodes[nodeid].Tracks[etrack].Filesize;
+						
 						stbuf.st_size = size;
 						
 						//stbuf.st_ctime = Engine.Tracks[etrack].UnixTimeCreated();
 						//stbuf.st_atime = Engine.Tracks[etrack].UnixTimeAccessed();
 						//stbuf.st_mtime = Engine.Tracks[etrack].UnixTimeCreated();
-						long unixtimecreated = Engine.Tracks[etrack].UnixTimeCreated();
+						long unixtimecreated = Engine.FSNodes[nodeid].Tracks[etrack].UnixTimeCreated();
 						//Logging.Write("Created Time: " + unixtimecreated.ToString() + " " + Engine.Tracks[etrack].CreatedAt);
 						stbuf.st_ctime = unixtimecreated;
 						stbuf.st_mtime = unixtimecreated;
-						stbuf.st_atime = Engine.Tracks[etrack].UnixTimeAccessed();
+						stbuf.st_atime = Engine.FSNodes[nodeid].Tracks[etrack].UnixTimeAccessed();
 						
 						stbuf.st_gid = (uint)Engine.Config.GroupID;
 						stbuf.st_uid = (uint)Engine.Config.UserID;
@@ -108,8 +138,17 @@ namespace Mono.Fuse.SoundCloud {
 					}
 				}
 				
-				return Errno.ENOENT;
+				Logging.Write("Track not found....");
 			}
+			catch(Exception ex)
+			{
+				Logging.Write("Caught exception in OnGetPathStatus");
+				Logging.Write(ex.Message);
+				Environment.Exit(0);
+			}
+			
+			return Errno.ENOENT;
+			
 			
 			/*switch (path) {
 				case "/":
@@ -141,23 +180,75 @@ namespace Mono.Fuse.SoundCloud {
 		{
 			Console.WriteLine ("(OnReadDirectory {0})", path);
 			paths = null;
-			if (path != "/")
-				return Errno.ENOENT;
+			string nodepath = SoundCloudFS.FileTree.Node.ParseNodeName(path);
 			
-			paths = GetEntries ();
+			int nodeid = SoundCloudFS.FileTree.Node.FindNode(nodepath);
+			if(nodeid < 0) { return Errno.ENOENT; }
+			
+			//if (path != "/")
+			//	return Errno.ENOENT;
+			
+			paths = GetEntries(nodeid);
 			return 0;
 		}
 		 
-		private IEnumerable<DirectoryEntry> GetEntries ()
+		private IEnumerable<DirectoryEntry> GetEntries (int nodeid)
 		{
 			yield return new DirectoryEntry (".");
 			yield return new DirectoryEntry ("..");
 			
-			for(int etrack = 0; etrack < Engine.Tracks.Length; etrack++)
+			//Logging.Write("Getting Entries...");
+			if(Engine.FSNodes[nodeid] != null)
+			{
+				
+				if(Engine.FSNodes[nodeid].NodeType == SoundCloudFS.FileTree.Node.NodeTypeTree)
+				{
+					//Logging.Write("Nodetype is a tree for node " + nodeid.ToString());
+					for(int esubn = 0; esubn < Engine.FSNodes[nodeid].SubNodes.Length; esubn++)
+					{
+						//Logging.Write("esubn: " + esubn.ToString());
+						if(Engine.FSNodes[nodeid].SubNodes[esubn] > -1)
+						{
+							int snid = Engine.FSNodes[nodeid].SubNodes[esubn];
+							//Logging.Write("Yielding DirectoryEntry: " + Engine.FSNodes[snid].Name);
+							yield return new DirectoryEntry(Engine.FSNodes[snid].Name);
+						}
+					}
+				}
+				else
+				{
+					//	Need to yield return each track here.
+					if(!Engine.FSNodes[nodeid].HasSearched)
+					{
+						if(!Engine.FSNodes[nodeid].RunSearch())
+						{
+							Logging.Write("Running search on node " + nodeid.ToString() + " failed.");
+						}
+					}
+					
+					if(Engine.FSNodes[nodeid].Tracks != null)
+					{
+						for(int etrack = 0; etrack < Engine.FSNodes[nodeid].Tracks.Length; etrack++)
+						{
+							if(Engine.FSNodes[nodeid].Tracks[etrack] != null)
+							{
+								//Logging.Write("Getting entry for track " + etrack.ToString());
+								DirectoryEntry de = new DirectoryEntry(Engine.FSNodes[nodeid].Tracks[etrack].Filename);
+								
+								
+								yield return de;
+						
+							}
+						}
+					}
+				}
+			}
+			
+			/*for(int etrack = 0; etrack < Engine.Tracks.Length; etrack++)
 			{
 				if(Engine.Tracks[etrack] != null)
 				{
-					Logging.Write("Getting entry for track " + etrack.ToString());
+					//Logging.Write("Getting entry for track " + etrack.ToString());
 					DirectoryEntry de = new DirectoryEntry(Engine.Tracks[etrack].Filename);
 					//de.Stat.st_atime = Engine.Tracks[etrack].UnixTimeAccessed();
 					//de.Stat.st_ctime = Engine.Tracks[etrack].UnixTimeCreated();
@@ -172,7 +263,7 @@ namespace Mono.Fuse.SoundCloud {
 					
 					yield return de;
 				}
-			}
+			}*/
 			
 		}
 
@@ -188,13 +279,17 @@ namespace Mono.Fuse.SoundCloud {
 				//return Errno.EACCES;
 			}
 			
-			for(int etrack = 0; etrack < Engine.Tracks.Length; etrack++)
+			string nodepath = SoundCloudFS.FileTree.Node.ParseNodeName(path);
+			string trackfilename = SoundCloudFS.FileTree.Node.ParseTrackFilename(path);
+			int nodeid = SoundCloudFS.FileTree.Node.FindNode(nodepath);
+			
+			for(int etrack = 0; etrack < Engine.FSNodes[nodeid].Tracks.Length; etrack++)
 			{
-				if(Engine.Tracks[etrack] != null)
+				if(Engine.FSNodes[nodeid].Tracks[etrack] != null)
 				{
-					if("/" + Engine.Tracks[etrack].Filename == path)
+					if(nodepath + "/" + Engine.FSNodes[nodeid].Tracks[etrack].Filename == path)
 					{
-						Engine.Tracks[etrack].Touch();
+						Engine.FSNodes[nodeid].Tracks[etrack].Touch();
 						return 0;
 					}
 				}
@@ -213,26 +308,31 @@ namespace Mono.Fuse.SoundCloud {
 		protected override Errno OnReadHandle (string path, OpenedPathInfo fi, byte[] buf, long offset, out int bytesWritten)
 		{
 			Console.WriteLine ("(OnRead: Path {0}, buflen {1}, offset {2})", path, buf.Length, offset);
+			string nodepath = SoundCloudFS.FileTree.Node.ParseNodeName(path);
+			string trackfilename = SoundCloudFS.FileTree.Node.ParseTrackFilename(path);
+			int nodeid = SoundCloudFS.FileTree.Node.FindNode(nodepath);
+			
 			bytesWritten = 0;
 			int size = buf.Length;
 			//if(7 != 32) { return Errno.ENOENT; }
 			bool found = false;
-			for(int etrack = 0; etrack < Engine.Tracks.Length; etrack++)
+			for(int etrack = 0; etrack < Engine.FSNodes[nodeid].Tracks.Length; etrack++)
 			{
-				if(Engine.Tracks[etrack] != null && path == "/" + Engine.Tracks[etrack].Filename)
+				Logging.Write(nodepath + "/" + Engine.FSNodes[nodeid].Tracks[etrack].Filename);
+				if(Engine.FSNodes[nodeid].Tracks[etrack] != null && path == nodepath + "/" + Engine.FSNodes[nodeid].Tracks[etrack].Filename)
 				{
-					Engine.Tracks[etrack].Touch();
+					Engine.FSNodes[nodeid].Tracks[etrack].Touch();
 					
-					if(!Engine.Tracks[etrack].Retrieved) 
+					if(!Engine.FSNodes[nodeid].Tracks[etrack].Retrieved) 
 					{
 						
-						if(!Engine.Tracks[etrack].Retrieve()) { return Errno.EAGAIN; }
+						if(!Engine.FSNodes[nodeid].Tracks[etrack].Retrieve()) { return Errno.EAGAIN; }
 					}
 					
-					if(offset < Engine.Tracks[etrack].RawData.Length)
+					if(offset < Engine.FSNodes[nodeid].Tracks[etrack].RawData.Length)
 					{
-						if(offset + (long)size > (long)Engine.Tracks[etrack].RawData.Length) { size = (int)((long)Engine.Tracks[etrack].RawData.Length - offset); }
-						Buffer.BlockCopy(Engine.Tracks[etrack].RawData, (int)offset, buf, 0, size);
+						if(offset + (long)size > (long)Engine.FSNodes[nodeid].Tracks[etrack].RawData.Length) { size = (int)((long)Engine.FSNodes[nodeid].Tracks[etrack].RawData.Length - offset); }
+						Buffer.BlockCopy(Engine.FSNodes[nodeid].Tracks[etrack].RawData, (int)offset, buf, 0, size);
 						found = true;
 						break;
 					}
@@ -301,7 +401,7 @@ namespace Mono.Fuse.SoundCloud {
 		protected override Errno OnSetPathExtendedAttribute (string path, string name, byte[] value, XattrFlags flags)
 		{
 			Console.WriteLine ("(OnSetPathExtendedAttribute {0})", path);
-			if (path != hello_path) {
+			if (path != "/hello") {
 				return Errno.ENOSPC;
 			}
 			lock (hello_attrs) {
@@ -313,7 +413,7 @@ namespace Mono.Fuse.SoundCloud {
 		protected override Errno OnRemovePathExtendedAttribute (string path, string name)
 		{
 			Console.WriteLine ("(OnRemovePathExtendedAttribute {0})", path);
-			if (path != hello_path)
+			if (path != "/hello")
 				return Errno.ENODATA;
 			lock (hello_attrs) {
 				if (!hello_attrs.ContainsKey (name))
@@ -326,7 +426,7 @@ namespace Mono.Fuse.SoundCloud {
 		protected override Errno OnListPathExtendedAttributes (string path, out string[] names)
 		{
 			Console.WriteLine ("(OnListPathExtendedAttributes {0})", path);
-			if (path != hello_path) {
+			if (path != "/hello") {
 				names = new string[]{};
 				return 0;
 			}
@@ -342,20 +442,52 @@ namespace Mono.Fuse.SoundCloud {
 		{
 			Logging.Write("In OnRemoveFile (" + file + ")");
 			//Logging.Write("Removing: " + file);
+			string nodepath = SoundCloudFS.FileTree.Node.ParseNodeName(file);
+			string trackfilename = SoundCloudFS.FileTree.Node.ParseTrackFilename(file);
+			int nodeid = SoundCloudFS.FileTree.Node.FindNode(nodepath);
 			
-			for(int etrack = 0; etrack < Engine.Tracks.Length; etrack++)
+			for(int etrack = 0; etrack < Engine.FSNodes[nodeid].Tracks.Length; etrack++)
 			{
-				if(Engine.Tracks[etrack] != null)
+				if(Engine.FSNodes[nodeid].Tracks[etrack] != null)
 				{
-					if("/" + Engine.Tracks[etrack].Filename == file)
+					if("/" + Engine.FSNodes[nodeid].Tracks[etrack].Filename == file)
 					{
-						Engine.Tracks[etrack] = null;
+						Engine.FSNodes[nodeid].Tracks[etrack] = null;
 						return 0;
 					}
 				}
 			}
 			return Errno.ENOENT;
 			//return base.OnRemoveFile (file);
+		}
+		
+		protected override Errno OnCreateDirectory (string directory, FilePermissions mode)
+		{
+			Logging.Write("In OnCreateDirectory (" + directory + ")");
+			
+			//	Determine which node this will be a sub-node of.
+			string npath = directory.Substring(0, directory.LastIndexOf("/") + 1);
+			Logging.Write("NodePath: " + npath);
+			
+			
+			int parentnodeid = SoundCloudFS.FileTree.Node.FindNode(npath);
+			Logging.Write("ParentNodeID: " + parentnodeid.ToString());
+			
+			if(parentnodeid < 0) { return Errno.ENOENT; }
+			
+			string newnodename = directory.Substring(directory.LastIndexOf('/') + 1);
+			int newnodeid = Engine.FSNodes[parentnodeid].AddSubNode(newnodename);
+			Engine.FSNodes[newnodeid].NodeType = SoundCloudFS.FileTree.Node.NodeTypeTree;
+			
+			Logging.Write("Created Directory, newnodeid: " + newnodeid.ToString());
+			//return base.OnCreateDirectory (directory, mode);
+			
+			if(Engine.Config.AutoSaveNodes)
+			{
+				SoundCloudFS.FileTree.Node.SaveNodes();
+			}
+			
+			return 0;
 		}
 
 
