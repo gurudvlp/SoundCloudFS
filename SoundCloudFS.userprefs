@@ -1,12 +1,12 @@
 ﻿<Properties>
   <AuthorInfo Name="Brian Murphy" Email="gurudvlp@gmail.com" Copyright="Brian Murphy" Company="Guru Digital Solutions" Trademark="" />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="SoundCloudFS/Main.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="SoundCloudFS/FileTree/Node.cs">
     <Files>
-      <File FileName="SoundCloudFS/Main.cs" Line="376" Column="21" />
+      <File FileName="SoundCloudFS/Main.cs" Line="378" Column="66" />
       <File FileName="SoundCloudFS/FS.cs" Line="94" Column="5" />
       <File FileName="SoundCloudFS/Interfaces/scfsd/scfsd.cs" Line="199" Column="1" />
-      <File FileName="SoundCloudFS/FileTree/Node.cs" Line="167" Column="28" />
+      <File FileName="SoundCloudFS/FileTree/Node.cs" Line="170" Column="45" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -16,12 +16,13 @@
           </Node>
           <Node name="SoundCloudFS" expanded="True">
             <Node name="Config" expanded="True" />
-            <Node name="FileTree" expanded="True" />
+            <Node name="FileTree" expanded="True">
+              <Node name="Node.cs" selected="True" />
+            </Node>
             <Node name="Interfaces" expanded="True">
               <Node name="scfsd" expanded="True" />
             </Node>
             <Node name="Scrapers" expanded="True" />
-            <Node name="Main.cs" selected="True" />
           </Node>
         </State>
       </Pad>

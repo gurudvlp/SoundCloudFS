@@ -165,7 +165,9 @@ namespace SoundCloudFS.FileTree
 		public bool RunSearch()
 		{
 			BuildSearchParameters();
+			Logging.Write("RunSearch with Parms: " + SearchParameters);
 			string SearchURL = btEngine.Engine.Config.BaseSearchURL.Replace("[SEARCHPARAMETERS]", SearchParameters);
+			Logging.Write("SearchURL: " + SearchURL);
 			
 			btEngine.Scrapers.SoundCloudSearch SearchScrape = new btEngine.Scrapers.SoundCloudSearch();
 			SearchScrape.ScrapeURL = SearchURL;
