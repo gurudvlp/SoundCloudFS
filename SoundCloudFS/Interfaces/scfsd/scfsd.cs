@@ -37,6 +37,7 @@ namespace btEngine
 		public string CurrentCommand = "";
 		public string CurrentDir = "/";
 		
+		
 		public scfsd ()
 		{
 		}
@@ -81,6 +82,11 @@ namespace btEngine
 				{
 					if(SoundCloudFS.FileTree.Node.SaveNodes()) { base.OutgoingBuffer = "OK\n"; }
 					else { base.OutgoingBuffer = "FAIL Path Nodes failed to save."; }
+				}
+				else if(CurrentCommand == "quit" || CurrentCommand == "exit")
+				{
+					base.OutgoingBuffer = "BYE\n";
+					base.TerminateAfterSend = true;
 				}
 				else if(CurrentCommand == "ls")
 				{
@@ -151,26 +157,29 @@ namespace btEngine
 						Engine.FSNodes[nodeid].NodeType = SoundCloudFS.FileTree.Node.NodeTypeSearch;
 						Engine.FSNodes[nodeid].HasSearched = false;
 						
-						string searchp = "";
-						bool haslimit = false;
-						bool hasoffset = false;
-						
-						char[] spat = new char[]{'='};
-						for(int ep = 1; ep < cmdparts.Length; ep++)
+						if(cmdparts[1] == "genres")
 						{
-							if(cmdparts[ep].Contains("="))
+							string genlist = CurrentCommand.Replace("query genres ", "");
+							
+							char[] spat = new char[]{','};
+							string[] genres = genlist.Split(spat);
+							for(int ep = 0; ep < genres.Length; ep++)
 							{
-								string[] eqprts = cmdparts[ep].Split(spat, 2);
-								searchp = searchp + "&" + eqprts[0] + "=" + eqprts[1];
-								if(eqprts[0] == "limit") { haslimit = true; }
-								if(eqprts[0] == "offset") { hasoffset = true; }
+								genres[ep] = genres[ep].Trim();
+								
 							}
+							
+							Engine.FSNodes[nodeid].QueryGenres = genres;
+						}
+						else if(cmdparts[1] == "limit")
+						{
+							Engine.FSNodes[nodeid].QueryLimit = Int32.Parse(cmdparts[2]);
+						}
+						else if(cmdparts[1] == "offset")
+						{
+							Engine.FSNodes[nodeid].QueryOffset = Int32.Parse(cmdparts[2]);
 						}
 						
-						if(!haslimit) { searchp = searchp + "&limit=" + Engine.Config.QueryLimit.ToString(); }
-						if(!hasoffset) { searchp = searchp + "&offset=" + Engine.Config.QueryOffset.ToString(); }
-						
-						Engine.FSNodes[nodeid].SearchParameters = searchp;
 						
 						if(Engine.Config.AutoSaveNodes)
 						{

@@ -51,6 +51,7 @@ namespace SoundCloudFS.FileTree
 		[XmlIgnoreAttribute()] public bool HasSearched = false;
 		[XmlElement("QueryLimit")] public int QueryLimit = Engine.Config.QueryLimit;
 		[XmlElement("QueryOffset")] public int QueryOffset = Engine.Config.QueryOffset;
+		[XmlElement("QueryGenres")] public string[] QueryGenres = new string[1];
 		
 		[XmlIgnoreAttribute()] public static int NodeTypeTree = 0;
 		[XmlIgnoreAttribute()] public static int NodeTypeSearch = 1;
@@ -163,6 +164,7 @@ namespace SoundCloudFS.FileTree
 		
 		public bool RunSearch()
 		{
+			BuildSearchParameters();
 			string SearchURL = btEngine.Engine.Config.BaseSearchURL.Replace("[SEARCHPARAMETERS]", SearchParameters);
 			
 			btEngine.Scrapers.SoundCloudSearch SearchScrape = new btEngine.Scrapers.SoundCloudSearch();
@@ -321,6 +323,24 @@ namespace SoundCloudFS.FileTree
 			}
 			
 			return true;
+		}
+		
+		public void BuildSearchParameters()
+		{
+			string sparm = "";
+			if(this.QueryGenres != null)
+			{
+				sparm = sparm + "&genres='";
+				for(int eg = 0; eg < this.QueryGenres.Length; eg++)
+				{
+					sparm = sparm + this.QueryGenres[eg] + ",";
+				}
+				sparm = sparm.Substring(0, sparm.Length - 1);
+				sparm = sparm + "'";
+			}
+			
+			sparm = sparm + "&limit=" + this.QueryLimit.ToString() + "&offset=" + this.QueryOffset.ToString();
+			this.SearchParameters = sparm;
 		}
 	}
 }

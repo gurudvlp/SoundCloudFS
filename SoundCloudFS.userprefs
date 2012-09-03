@@ -3,16 +3,14 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="SoundCloudFS/Main.cs">
     <Files>
-      <File FileName="SoundCloudFS/Main.cs" Line="15" Column="52" />
+      <File FileName="SoundCloudFS/Main.cs" Line="376" Column="21" />
       <File FileName="SoundCloudFS/FS.cs" Line="94" Column="5" />
-      <File FileName="SoundCloudFS/Interfaces/scfsd/scfsd.cs" Line="102" Column="8" />
-      <File FileName="scfs-cli/Main.cs" Line="74" Column="24" />
-      <File FileName="scfs-cli/Connector.cs" Line="53" Column="18" />
-      <File FileName="scfs-cli/Config/Config.cs" Line="60" Column="22" />
+      <File FileName="SoundCloudFS/Interfaces/scfsd/scfsd.cs" Line="199" Column="1" />
+      <File FileName="SoundCloudFS/FileTree/Node.cs" Line="167" Column="28" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
-        <State expanded="True" selected="True">
+        <State expanded="True">
           <Node name="scfs-cli" expanded="True">
             <Node name="Config" expanded="True" />
           </Node>
@@ -23,6 +21,7 @@
               <Node name="scfsd" expanded="True" />
             </Node>
             <Node name="Scrapers" expanded="True" />
+            <Node name="Main.cs" selected="True" />
           </Node>
         </State>
       </Pad>
