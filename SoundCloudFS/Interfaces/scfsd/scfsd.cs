@@ -170,6 +170,12 @@ namespace btEngine
 						base.OutgoingBuffer = Engine.FSNodes[nodeid].QueryOffset.ToString() + "\n";
 					}
 				}
+				else if(CurrentCommand == "nodetype")
+				{
+					int nodeid = SoundCloudFS.FileTree.Node.FindNode(CurrentDir);
+					if(Engine.FSNodes[nodeid] == SoundCloudFS.FileTree.Node.NodeTypeSearch) { base.OutgoingBuffer = "search\n"; }
+					else { base.OutgoingBuffer = "tree"; }
+				}
 				
 				if(CurrentCommand.Contains(" "))
 				{
@@ -247,6 +253,40 @@ namespace btEngine
 						}
 						
 						base.OutgoingBuffer = "OK\n";
+					}
+					else if(cmdparts[0] == "mkdir")
+					{
+						string dirname = cmdparts[1];
+						int nodeid = SoundCloudFS.FileTree.Node.FindNode(CurrentDir);
+						
+						int newnode = Engine.FSNodes[nodeid].AddSubNode(dirname);
+						if(newnode < 0) { base.OutgoingBuffer = "FAIL New node failed to be created.\n"; }
+						else
+						{
+							Engine.FSNodes[nodeid].NodeType = SoundCloudFS.FileTree.Node.NodeTypeTree;
+							base.OutgoingBuffer = "OK\n";
+						}
+						
+					}
+					else if(cmdparts[0] == "rmdir")
+					{
+						string dirname = cmdparts[1];
+						int nodeid = SoundCloudFS.FileTree.Node.FindNode(CurrentDir + "/" + dirname);
+						int parentnode = SoundCloudFS.FileTree.Node.FindNode(CurrentDir);
+						
+						if(nodeid < 0) { base.OutgoingBuffer = "FAIL Node not found.\n"; }
+						else
+						{
+							if(SoundCloudFS.FileTree.Node.RemoveNode(nodeid)
+							&& Engine.FSNodes[parentnode].UnlinkSubNode(nodeid))
+							{
+								base.OutgoingBuffer = "OK\n";
+							}
+							else
+							{
+								base.OutgoingBuffer = "FAIL Node was not removed.";
+							}
+						}
 					}
 					else if(cmdparts[0] == "autosavenodes")
 					{

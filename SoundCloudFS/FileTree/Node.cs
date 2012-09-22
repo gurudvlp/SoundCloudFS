@@ -52,6 +52,9 @@ namespace SoundCloudFS.FileTree
 		[XmlElement("QueryLimit")] public int QueryLimit = Engine.Config.QueryLimit;
 		[XmlElement("QueryOffset")] public int QueryOffset = Engine.Config.QueryOffset;
 		[XmlElement("QueryGenres")] public string[] QueryGenres = new string[1];
+		[XmlElement("QueryByUser")] public bool QueryByUser = false;
+		[XmlElement("QueryUser")] public int QueryUser = -1;
+		[XmlElement("QueryUsername")] public string QueryUserName = "";
 		
 		[XmlIgnoreAttribute()] public static int NodeTypeTree = 0;
 		[XmlIgnoreAttribute()] public static int NodeTypeSearch = 1;
@@ -152,6 +155,31 @@ namespace SoundCloudFS.FileTree
 			return -1;
 		}
 		
+		public static bool RemoveNode(int nodeid)
+		{
+			//	Remove a node, it's sub nodes, and all tracks associated with it.
+			//	Because nodes don't keep track of their parent, the parent will
+			//	still list this node as a subnode.  This won't be a problem until
+			//	you try to create a new node that has the same ID that the original
+			//	parent lists as a subnode.  That could be quite an interesting
+			//	phenomonon.
+			
+			if(Engine.FSNodes[nodeid] == null) { return false; }
+			
+			for(int esn = 0; esn < Engine.FSNodes[nodeid].SubNodes.Length; esn++)
+			{
+				if(Engine.FSNodes[nodeid].SubNodes[esn] < 0) 
+				{ 
+					if(!SoundCloudFS.FileTree.Node.RemoveNode(Engine.FSNodes[nodeid].SubNodes[esn])) { return false; }
+				}
+				
+			}
+			
+			Engine.FSNodes[nodeid].Tracks = null;
+			
+			return true;
+		}
+		
 		public int NextSubNode()
 		{
 			for(int esubn = 0; esubn < SubNodes.Length; esubn++)
@@ -162,9 +190,29 @@ namespace SoundCloudFS.FileTree
 			return -1;
 		}
 		
+		public bool UnlinkSubNode(int nodeid)
+		{
+			//	This won't actually delete a subnode and it's contents, but remove
+			//	it from the list of subnodes.
+			
+			for(int esn = 0; esn < SubNodes.Length; esn++)
+			{
+				if(SubNodes[esn] == nodeid) { SubNodes[esn] = -1; return true; }
+			}
+			
+			return false;
+		}
+		
 		public bool RunSearch()
 		{
-			BuildSearchParameters();
+			if(!QueryByUser) { BuildSearchParameters(); }
+			else
+			{
+				//	This search needs to be by a user rather than by a genre list.  So...
+				//	we need to look the username up to determine a userid, which we can then
+				//	use to grab a list of tracks.
+			}
+			
 			Logging.Write("RunSearch with Parms: " + SearchParameters);
 			string SearchURL = btEngine.Engine.Config.BaseSearchURL.Replace("[SEARCHPARAMETERS]", SearchParameters);
 			Logging.Write("SearchURL: " + SearchURL);
@@ -343,6 +391,14 @@ namespace SoundCloudFS.FileTree
 			
 			sparm = sparm + "&limit=" + this.QueryLimit.ToString() + "&offset=" + this.QueryOffset.ToString();
 			this.SearchParameters = sparm;
+		}
+		
+		public void BuildSearchParametersByUser()
+		{
+			if(QueryUser < 0)
+			{
+				
+			}
 		}
 	}
 }
