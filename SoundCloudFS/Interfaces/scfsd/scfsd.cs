@@ -174,7 +174,7 @@ namespace btEngine
 				{
 					int nodeid = SoundCloudFS.FileTree.Node.FindNode(CurrentDir);
 					if(Engine.FSNodes[nodeid].NodeType == SoundCloudFS.FileTree.Node.NodeTypeSearch) { base.OutgoingBuffer = "search\n"; }
-					else { base.OutgoingBuffer = "tree"; }
+					else { base.OutgoingBuffer = "tree\n"; }
 				}
 				
 				if(CurrentCommand.Contains(" "))
