@@ -205,6 +205,7 @@ namespace btEngine
 					{
 						string newpath = CurrentDir;
 						if(!newpath.EndsWith("/")) { newpath = newpath + "/"; }
+						if(cmdparts[1].StartsWith("/")) { newpath = ""; }
 						newpath = newpath + cmdparts[1];
 						
 						int nodeid = SoundCloudFS.FileTree.Node.FindNode(newpath);
