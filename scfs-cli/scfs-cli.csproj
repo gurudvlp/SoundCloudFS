@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>scfscli</RootNamespace>
     <AssemblyName>scfs-cli</AssemblyName>
-    <ReleaseVersion>0.12.09.03</ReleaseVersion>
+    <ReleaseVersion>0.12.10.17</ReleaseVersion>
     <Description>Control the SoundCloudFS Daemon via the command line.</Description>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -31,6 +31,12 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <Externalconsole>true</Externalconsole>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Windows|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Windows</OutputPath>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

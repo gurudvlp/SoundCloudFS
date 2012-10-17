@@ -9,16 +9,21 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
+		Windows|Any CPU = Windows|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{1E387BAD-0232-43DF-AE00-AE35CF3B693E}.Debug|x86.ActiveCfg = Debug|x86
 		{1E387BAD-0232-43DF-AE00-AE35CF3B693E}.Debug|x86.Build.0 = Debug|x86
 		{1E387BAD-0232-43DF-AE00-AE35CF3B693E}.Release|x86.ActiveCfg = Release|x86
 		{1E387BAD-0232-43DF-AE00-AE35CF3B693E}.Release|x86.Build.0 = Release|x86
+		{1E387BAD-0232-43DF-AE00-AE35CF3B693E}.Windows|Any CPU.ActiveCfg = Windows|Any CPU
+		{1E387BAD-0232-43DF-AE00-AE35CF3B693E}.Windows|Any CPU.Build.0 = Windows|Any CPU
 		{75A3564A-2764-4ABE-8FFF-872F43D7346A}.Debug|x86.ActiveCfg = Debug|x86
 		{75A3564A-2764-4ABE-8FFF-872F43D7346A}.Debug|x86.Build.0 = Debug|x86
 		{75A3564A-2764-4ABE-8FFF-872F43D7346A}.Release|x86.ActiveCfg = Release|x86
 		{75A3564A-2764-4ABE-8FFF-872F43D7346A}.Release|x86.Build.0 = Release|x86
+		{75A3564A-2764-4ABE-8FFF-872F43D7346A}.Windows|Any CPU.ActiveCfg = Windows|Any CPU
+		{75A3564A-2764-4ABE-8FFF-872F43D7346A}.Windows|Any CPU.Build.0 = Windows|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = SoundCloudFS\SoundCloudFS.csproj
@@ -37,6 +42,6 @@ Global
 		$5.LineAlign = 0
 		$4.inheritsSet = Mono
 		description = Mount SoundCloud audio streams as a local filesystem.
-		version = 0.12.09.03
+		version = 0.12.10.17
 	EndGlobalSection
 EndGlobal

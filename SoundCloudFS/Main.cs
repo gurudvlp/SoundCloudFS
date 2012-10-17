@@ -55,29 +55,31 @@ namespace btEngine
 			
 			//	Check if this is a 64-bit or 32-bit environment.  Also list the files available.
 			
-			string curdir = Environment.CurrentDirectory;
-			string lookfor = curdir + "/libMonoFuseHelper.so";
-			
-			
-			if(File.Exists(lookfor))
+			if(Environment.OSVersion.Platform == PlatformID.Unix)
 			{
-				//	WooHoo, the proper libMonoFuseHelper library was found.
-			}
-			else
-			{
-				//	We need to determine the archetecture that we are running on so that we can
-				//	put the proper libMonoFuseHelper where it belongs.
-				if(Environment.Is64BitOperatingSystem)
+				string curdir = Environment.CurrentDirectory;
+				string lookfor = curdir + "/libMonoFuseHelper.so";
+				
+				
+				if(File.Exists(lookfor))
 				{
-					File.Copy(curdir + "/libMonoFuseHelper-x64.so", lookfor);
+					//	WooHoo, the proper libMonoFuseHelper library was found.
 				}
 				else
 				{
-					File.Copy(curdir + "/libMonoFuseHelper-i686.so", lookfor);
+					//	We need to determine the archetecture that we are running on so that we can
+					//	put the proper libMonoFuseHelper where it belongs.
+					if(Environment.Is64BitOperatingSystem)
+					{
+						File.Copy(curdir + "/libMonoFuseHelper-x64.so", lookfor);
+					}
+					else
+					{
+						File.Copy(curdir + "/libMonoFuseHelper-i686.so", lookfor);
+					}
 				}
+			
 			}
-			
-			
 
 			
 			Engine.ConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "soundcloudfs");
@@ -336,40 +338,68 @@ namespace btEngine
 			
 			Thread daemonthread = new Thread(DaemonHeart);
 			daemonthread.Start();
+		
+#if WINDOWS
 			
-			using (Mono.Fuse.SoundCloud.FS fs = new Mono.Fuse.SoundCloud.FS ())
+			if(Environment.OSVersion.Platform != PlatformID.Unix)
 			{
+				Dokan.SoundCloud.DK dk = new Dokan.SoundCloud.DK();
 				
+				if(Engine.Config.MountPoint == null || Engine.Config.MountPoint == "") { dk.MountPoint = args[0]; }
+				else { dk.MountPoint = Engine.Config.MountPoint; }
 				
-				/*string[] unhandled = fs.ParseFuseArguments (args);
-				foreach (string key in fs.FuseOptions.Keys) {
-					Console.WriteLine ("Option: {0}={1}", key, fs.FuseOptions [key]);
-				}
-				if (!fs.ParseArguments (unhandled))
-					return;*/
-				//fs.MountAt ("path" /* , args? */);
+				if(dk.MountPoint.Length == 1) { dk.MountPoint = dk.MountPoint + ":\\"; }
+				else if(dk.MountPoint.Length == 2) { dk.MountPoint = dk.MountPoint + "\\"; }
+				//else if(dk.MountPoint.Length == 3) { dk.MountPoint = dk.MountPoint + "\\"; }
 				
-				//fs.FuseOptions.Add
-				
-				
-				if(Engine.Config.AllowOthers)
-				{
-					//
-					//	Right now, -o allow_other is enabled by default.  Really though,
-					//	most systems seem to not enable this by default, so this is sort
-					//	of a bug.
-					//
-					
-					string[] fuseopts = new string[]{"-o", "allow_other"};
-					string[] unhandled = fs.ParseFuseArguments(fuseopts);
-				}
-				
-				if(Engine.Config.MountPoint == null || Engine.Config.MountPoint == "") { fs.MountPoint = args[0]; }
-				else { fs.MountPoint = Engine.Config.MountPoint; }
-				if(fs.MountPoint.LastIndexOf("/") == fs.MountPoint.Length - 1) { fs.MountPoint = fs.MountPoint.Substring(0, fs.MountPoint.Length - 1); }
-				fs.Start ();
+				dk.Start();
 				
 			}
+#else
+			if(Environment.OSVersion.Platform == PlatformID.Unix)
+			{
+				
+				try
+				{
+					using (Mono.Fuse.SoundCloud.FS fs = new Mono.Fuse.SoundCloud.FS ())
+					{
+						
+						//Mono.Fuse.SoundCloud.FS fs = new Mono.Fuse.SoundCloud.FS();
+						
+						
+						if(Engine.Config.AllowOthers)
+						{
+							//
+							//	Right now, -o allow_other is enabled by default.  Really though,
+							//	most systems seem to not enable this by default, so this is sort
+							//	of a bug.
+							//
+							
+							string[] fuseopts = new string[]{"-o", "allow_other"};
+							string[] unhandled = fs.ParseFuseArguments(fuseopts);
+						}
+						/*string usemountpoint = "";
+						
+						if(Engine.Config.MountPoint == null || Engine.Config.MountPoint == "") { usemountpoint = args[0]; }
+						else { usemountpoint = Engine.Config.MountPoint; }
+						if(usemountpoint.LastIndexOf("/") == usemountpoint.Length - 1) { usemountpoint = usemountpoint.Substring(0, usemountpoint.Length - 1); }
+						Mono.Fuse.SoundCloud.FS.Launch(usemountpoint);
+						*/
+						if(Engine.Config.MountPoint == null || Engine.Config.MountPoint == "") { fs.MountPoint = args[0]; }
+						else { fs.MountPoint = Engine.Config.MountPoint; }
+						if(fs.MountPoint.LastIndexOf("/") == fs.MountPoint.Length - 1) { fs.MountPoint = fs.MountPoint.Substring(0, fs.MountPoint.Length - 1); }
+						fs.Start ();
+						
+					}
+				}
+				catch(Exception ex)
+				{
+					Logging.Write("Exception while launching FUSE filesystem.");
+					Logging.Write(ex.Message);
+				}
+
+			}
+#endif
 			
 			
 		}
@@ -490,6 +520,20 @@ namespace btEngine
 			   s.Append(b.ToString("x2").ToLower());
 			}
 			return s.ToString();
+		}
+		
+		public static string PFP(string inpath)
+		{
+			if(Environment.OSVersion.Platform == PlatformID.Unix)
+			{
+				inpath = inpath.Replace("\\", "/");
+			}
+			else
+			{
+				inpath = inpath.Replace("/", "\\");
+			}
+			
+			return inpath;
 		}
 	}
 }

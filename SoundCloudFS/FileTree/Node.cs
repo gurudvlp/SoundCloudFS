@@ -102,12 +102,13 @@ namespace SoundCloudFS.FileTree
 		public static int FindNode(string nodename)
 		{
 			int tnode = -1;
-			string npath = nodename;
+			string npath = nodename.Replace("\\", "/");
 			//Logging.Write("FindNode: " + nodename);
 			if(npath.Substring(0, 1) == "/") { npath = npath.Substring(1); }
 			
 			if(npath.Length > 0 && npath.Substring(npath.Length - 1) == "/") { npath = npath.Substring(0, npath.Length - 1); }
 			
+			if(npath.Length == 0) { return 0; }
 			
 			if(nodename == "/") { return tnode = 0; }
 			else { tnode = Engine.FSNodes[0].FindNodeInSubNodes(npath); }
@@ -118,6 +119,7 @@ namespace SoundCloudFS.FileTree
 		public int FindNodeInSubNodes(string nodepath)
 		{
 			//Logging.Write("FindNodeInSubNodes: " + this.ID.ToString() + " :: " + nodepath);
+			nodepath = nodepath.Replace("\\", "/");
 			char[] splitat = new char[]{'/'};
 			bool gofurther = true;
 			
@@ -340,6 +342,7 @@ namespace SoundCloudFS.FileTree
 		
 		public static string ParseNodeName(string nodepath)
 		{
+			nodepath = nodepath.Replace("\\", "/");
 			if(nodepath.EndsWith(".mp3"))
 			{
 				//	Looking for status on a file, not a path node
@@ -354,6 +357,7 @@ namespace SoundCloudFS.FileTree
 		
 		public static string ParseTrackFilename(string nodepath)
 		{
+			nodepath = nodepath.Replace("\\", "/");
 			if(nodepath.EndsWith(".mp3"))
 			{
 				//	Looking for status on a file, not a path node

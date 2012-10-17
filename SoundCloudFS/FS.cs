@@ -512,7 +512,12 @@ namespace Mono.Fuse.SoundCloud {
 			return true;
 		}*/
 
-		
+		public static void Launch(string mountpoint)
+		{
+			Mono.Fuse.SoundCloud.FS fs = new Mono.Fuse.SoundCloud.FS();
+			fs.MountPoint = mountpoint;
+			fs.Start();
+		}
 
 		
 	}
