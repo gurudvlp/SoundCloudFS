@@ -12,7 +12,7 @@ namespace btEngine
 	class Engine
 	{
 		public static string EngineName = "SoundCloudFS";
-		public static string EngineVersion = "v0.12.10.16";
+		public static string EngineVersion = "v0.12.10.17";
 		public static SoundCloudFS.Config.Config Config = new SoundCloudFS.Config.Config();
 		//public static bool DisplayDebug = true;
 		public static Dictionary<string, string> Filters = new Dictionary<string, string>();

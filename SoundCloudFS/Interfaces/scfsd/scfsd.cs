@@ -207,6 +207,7 @@ namespace btEngine
 						if(!newpath.EndsWith("/")) { newpath = newpath + "/"; }
 						if(cmdparts[1].StartsWith("/")) { newpath = ""; }
 						newpath = newpath + cmdparts[1];
+						if(newpath.EndsWith("/") && newpath.Length > 1) { newpath = newpath.Substring(0, newpath.Length - 1); }
 						
 						int nodeid = SoundCloudFS.FileTree.Node.FindNode(newpath);
 						
@@ -269,6 +270,7 @@ namespace btEngine
 						}
 						else if(cmdparts[1] == "username")
 						{
+							
 							Engine.FSNodes[nodeid].QueryUserName = cmdparts[2];
 							Engine.FSNodes[nodeid].QueryByUser = true;
 							Engine.FSNodes[nodeid].HasSearched = false;
@@ -298,11 +300,13 @@ namespace btEngine
 					}
 					else if(cmdparts[0] == "rmdir")
 					{
-						string dirname = cmdparts[1];
-						int nodeid = SoundCloudFS.FileTree.Node.FindNode(CurrentDir + "/" + dirname);
+						string dirname = CurrentDir + "/" + cmdparts[1];
+						if(dirname.StartsWith("//")) { dirname = dirname.Replace("//", "/"); }
+						
+						int nodeid = SoundCloudFS.FileTree.Node.FindNode(dirname);
 						int parentnode = SoundCloudFS.FileTree.Node.FindNode(CurrentDir);
 						
-						if(nodeid < 0) { base.OutgoingBuffer = "FAIL Node not found.\n"; }
+						if(nodeid < 0) { base.OutgoingBuffer = "FAIL Node not found (" + dirname + ").\n"; }
 						else
 						{
 							if(SoundCloudFS.FileTree.Node.RemoveNode(nodeid)

@@ -164,15 +164,27 @@ namespace SoundCloudFS.FileTree
 			//	parent lists as a subnode.  That could be quite an interesting
 			//	phenomonon.
 			
+			
 			if(Engine.FSNodes[nodeid] == null) { return false; }
+			
+			if(Engine.FSNodes[nodeid].SubNodes == null) { return false; }
 			
 			for(int esn = 0; esn < Engine.FSNodes[nodeid].SubNodes.Length; esn++)
 			{
-				if(Engine.FSNodes[nodeid].SubNodes[esn] < 0) 
-				{ 
-					if(!SoundCloudFS.FileTree.Node.RemoveNode(Engine.FSNodes[nodeid].SubNodes[esn])) { return false; }
+				try
+				{
+					if(Engine.FSNodes[nodeid].SubNodes != null)
+					{
+						if(Engine.FSNodes[nodeid].SubNodes[esn] < 0) 
+						{ 
+							if(!SoundCloudFS.FileTree.Node.RemoveNode(Engine.FSNodes[nodeid].SubNodes[esn])) { return false; }
+						}
+					}
 				}
-				
+				catch(Exception ex)
+				{
+					Logging.Write("SubNode[" + esn.ToString() + "] is out of range.");
+				}
 			}
 			
 			Engine.FSNodes[nodeid].Tracks = null;
