@@ -12,7 +12,7 @@ namespace btEngine
 	class Engine
 	{
 		public static string EngineName = "SoundCloudFS";
-		public static string EngineVersion = "v0.12.09.03";
+		public static string EngineVersion = "v0.12.10.16";
 		public static SoundCloudFS.Config.Config Config = new SoundCloudFS.Config.Config();
 		//public static bool DisplayDebug = true;
 		public static Dictionary<string, string> Filters = new Dictionary<string, string>();
@@ -52,6 +52,32 @@ namespace btEngine
 				
 				Environment.Exit(0);
 			}
+			
+			//	Check if this is a 64-bit or 32-bit environment.  Also list the files available.
+			
+			string curdir = Environment.CurrentDirectory;
+			string lookfor = curdir + "/libMonoFuseHelper.so";
+			
+			
+			if(File.Exists(lookfor))
+			{
+				//	WooHoo, the proper libMonoFuseHelper library was found.
+			}
+			else
+			{
+				//	We need to determine the archetecture that we are running on so that we can
+				//	put the proper libMonoFuseHelper where it belongs.
+				if(Environment.Is64BitOperatingSystem)
+				{
+					File.Copy(curdir + "/libMonoFuseHelper-x64.so", lookfor);
+				}
+				else
+				{
+					File.Copy(curdir + "/libMonoFuseHelper-i686.so", lookfor);
+				}
+			}
+			
+
 			
 			Engine.ConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "soundcloudfs");
 			if(!System.IO.Directory.Exists(Engine.ConfigPath))
@@ -327,6 +353,12 @@ namespace btEngine
 				
 				if(Engine.Config.AllowOthers)
 				{
+					//
+					//	Right now, -o allow_other is enabled by default.  Really though,
+					//	most systems seem to not enable this by default, so this is sort
+					//	of a bug.
+					//
+					
 					string[] fuseopts = new string[]{"-o", "allow_other"};
 					string[] unhandled = fs.ParseFuseArguments(fuseopts);
 				}
