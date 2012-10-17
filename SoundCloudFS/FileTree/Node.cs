@@ -211,6 +211,43 @@ namespace SoundCloudFS.FileTree
 				//	This search needs to be by a user rather than by a genre list.  So...
 				//	we need to look the username up to determine a userid, which we can then
 				//	use to grab a list of tracks.
+				
+				string FindUserURL = "http://api.soundcloud.com/users?client_id=" + Engine.Config.ClientID + "&q='" + QueryUserName + "'&limit=1";
+				
+				btEngine.Scrapers.SoundCloudSearch FindUserScrape = new btEngine.Scrapers.SoundCloudSearch();
+				FindUserScrape.ScrapeURL = FindUserURL;
+				
+				if(FindUserScrape.TakeTurn())
+				{
+					string workwith = FindUserScrape.PageText;
+					workwith = workwith.Substring(workwith.IndexOf("<user>"));
+					workwith = workwith.Replace("<user>", "");
+					string[] splitat = new string[]{"</user>"};
+					string[] parts = workwith.Split(splitat, StringSplitOptions.None);
+					workwith = parts[0].Trim();
+					
+					/*
+					Logging.Write("---");
+					Logging.Write(workwith);
+					Logging.Write("---");
+					*/
+					
+					if(workwith.Length > 10)
+					{
+						System.IO.File.WriteAllText("tmpresult.xml", "<user>" + workwith + "</user>");
+						XmlSerializer s = new XmlSerializer(typeof(SoundCloudFS.User));
+						TextReader tr = new StreamReader("tmpresult.xml");
+						SoundCloudFS.User tmpuser = new SoundCloudFS.User();
+						tmpuser = (SoundCloudFS.User)s.Deserialize(tr);
+						tr.Close();
+						System.IO.File.Delete("tmpresult.xml");
+						
+						QueryUser = tmpuser.ID;
+						BuildSearchParametersByUser();
+						//SearchParameters = SearchParameters + "&user_id=" + tmpuser.ID.ToString();
+						//Logging.Write("SearchParams: " + SearchParameters);
+					}
+				}
 			}
 			
 			Logging.Write("RunSearch with Parms: " + SearchParameters);
@@ -269,6 +306,26 @@ namespace SoundCloudFS.FileTree
 			return true;
 		}
 		
+		public void DecayTracks(long beforetime)
+		{
+			if(Tracks == null) { return; }
+			if(NodeType == SoundCloudFS.FileTree.Node.NodeTypeTree) { return; }
+			
+			for(int et = 0; et < Tracks.Length; et++)
+			{
+				if(Tracks[et] != null)
+				{
+					if(Tracks[et].UnixTimeAccessed() < beforetime)
+					{
+						Tracks[et].RawData = null;
+						Tracks[et].Retrieved = false;
+						Tracks[et].RetrievalStarted = false;
+						Tracks[et].BytesRetrieved = 0;
+					}
+				}
+			}
+		}
+		
 		public static string ParseNodeName(string nodepath)
 		{
 			if(nodepath.EndsWith(".mp3"))
@@ -294,6 +351,7 @@ namespace SoundCloudFS.FileTree
 			
 			return "";
 		}
+		
 		
 		public static bool SaveNodes()
 		{
@@ -397,8 +455,12 @@ namespace SoundCloudFS.FileTree
 		{
 			if(QueryUser < 0)
 			{
-				
+				BuildSearchParameters();
+				return;
 			}
+			
+			string sparm = "&user_id=" + QueryUser.ToString() + "&limit=" + QueryLimit.ToString() + "&offset=" + QueryOffset.ToString();
+			this.SearchParameters = sparm;
 		}
 	}
 }

@@ -77,6 +77,7 @@ namespace btEngine
 				}
 			}
 			
+			
 
 			
 			Engine.ConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "soundcloudfs");
@@ -401,6 +402,21 @@ namespace btEngine
 						{
 							//Logging.Write("Connection " + ec.ToString() + " is active.");
 							Connections[ec].TakeTurn();
+						}
+					}
+				}
+				
+				if(theminute > lastminute)
+				{
+					//	Decay any tracks in RAM that haven't been touched recently.
+					if(FSNodes != null && Config.DecayTime > 0)
+					{
+						for(int en = 0; en < FSNodes.Length; en++)
+						{
+							if(FSNodes[en] != null)
+							{
+								FSNodes[en].DecayTracks(TimeStamp() - Config.DecayTime);
+							}
 						}
 					}
 				}

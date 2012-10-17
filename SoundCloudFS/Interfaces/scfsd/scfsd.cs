@@ -146,6 +146,25 @@ namespace btEngine
 						}
 					}
 				}
+				else if(CurrentCommand == "lsuser")
+				{
+					int nodeid = SoundCloudFS.FileTree.Node.FindNode(CurrentDir);
+					if(Engine.FSNodes[nodeid].NodeType == SoundCloudFS.FileTree.Node.NodeTypeTree)
+					{
+						base.OutgoingBuffer = "FAIL Node is a tree, not a search.\n";
+					}
+					else
+					{
+						if(Engine.FSNodes[nodeid].QueryUserName == null || Engine.FSNodes[nodeid].QueryUserName == "")
+						{
+							base.OutgoingBuffer = "FAIL No username is set.\n";
+						}
+						else
+						{
+							base.OutgoingBuffer = Engine.FSNodes[nodeid].QueryUserName + "\n";
+						}
+					}
+				}
 				else if(CurrentCommand == "lslimit")
 				{
 					int nodeid = SoundCloudFS.FileTree.Node.FindNode(CurrentDir);
@@ -236,6 +255,8 @@ namespace btEngine
 							}
 							
 							Engine.FSNodes[nodeid].QueryGenres = genres;
+							Engine.FSNodes[nodeid].QueryByUser = false;
+							Engine.FSNodes[nodeid].HasSearched = false;
 						}
 						else if(cmdparts[1] == "limit")
 						{
@@ -244,6 +265,12 @@ namespace btEngine
 						else if(cmdparts[1] == "offset")
 						{
 							Engine.FSNodes[nodeid].QueryOffset = Int32.Parse(cmdparts[2]);
+						}
+						else if(cmdparts[1] == "username")
+						{
+							Engine.FSNodes[nodeid].QueryUserName = cmdparts[2];
+							Engine.FSNodes[nodeid].QueryByUser = true;
+							Engine.FSNodes[nodeid].HasSearched = false;
 						}
 						
 						
