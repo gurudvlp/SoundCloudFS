@@ -1,21 +1,27 @@
 ﻿<Properties>
   <AuthorInfo Name="Brian Murphy" Email="gurudvlp@gmail.com" Copyright="Brian Murphy" Company="Guru Digital Solutions" Trademark="" />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="SoundCloudFS/Main.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="SoundCloudFS/Interfaces/scfsd/scfsd.cs">
     <Files>
-      <File FileName="SoundCloudFS/Main.cs" Line="352" Column="29" />
+      <File FileName="SoundCloudFS/Main.cs" Line="465" Column="61" />
       <File FileName="SoundCloudFS/Interfaces/scfsd/scfsd.cs" Line="293" Column="4" />
-      <File FileName="SoundCloudFS/FileTree/Node.cs" Line="220" Column="15" />
+      <File FileName="SoundCloudFS/FileTree/Node.cs" Line="281" Column="5" />
       <File FileName="SoundCloudFS/Track.cs" Line="56" Column="3" />
       <File FileName="SoundCloudFS/Scrapers/Scraper.cs" Line="139" Column="17" />
-      <File FileName="SoundCloudFS/DK.cs" Line="328" Column="6" />
+      <File FileName="SoundCloudFS/DK.cs" Line="37" Column="35" />
       <File FileName="SoundCloudFS/FS.cs" Line="519" Column="15" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="SoundCloudFS" expanded="True" selected="True">
+          <Node name="SoundCloudFS" expanded="True">
             <Node name="References" expanded="True" />
+            <Node name="FileTree" expanded="True" />
+            <Node name="Interfaces" expanded="True">
+              <Node name="scfsd" expanded="True">
+                <Node name="scfsd.cs" selected="True" />
+              </Node>
+            </Node>
           </Node>
         </State>
       </Pad>

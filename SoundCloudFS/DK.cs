@@ -445,9 +445,13 @@ namespace Dokan.SoundCloud
         public int GetDiskFreeSpace(ref ulong freeBytesAvailable, ref ulong totalBytes,
             ref ulong totalFreeBytes, DokanFileInfo info)
         {
-            freeBytesAvailable = 512 * 1024 * 1024;
+            /*freeBytesAvailable = 512 * 1024 * 1024;
             totalBytes = 1024 * 1024 * 1024;
-            totalFreeBytes = 512 * 1024 * 1024;
+            totalFreeBytes = 512 * 1024 * 1024;*/
+			totalBytes = (ulong)SoundCloudFS.FileTree.Node.TotalTrackSize;
+			freeBytesAvailable = 0;
+			totalFreeBytes = 0;
+			
             return 0;
         }
 
@@ -473,25 +477,25 @@ namespace Dokan.SoundCloud
             switch (status)
             {
                 case DokanNet.DOKAN_DRIVE_LETTER_ERROR:
-                    Console.WriteLine("Drvie letter error");
+					Logging.Write("Drive letter error");
                     break;
                 case DokanNet.DOKAN_DRIVER_INSTALL_ERROR:
-                    Console.WriteLine("Driver install error");
+                    Logging.Write("Driver install error");
                     break;
                 case DokanNet.DOKAN_MOUNT_ERROR:
-                    Console.WriteLine("Mount error");
+                    Logging.Write("Mount error");
                     break;
                 case DokanNet.DOKAN_START_ERROR:
-                    Console.WriteLine("Start error");
+                    Logging.Write("Start error");
                     break;
                 case DokanNet.DOKAN_ERROR:
-                    Console.WriteLine("Unknown error");
+                    Logging.Write("Unknown error");
                     break;
                 case DokanNet.DOKAN_SUCCESS:
-                    Console.WriteLine("Success");
+                    Logging.Write("Success");
                     break;
                 default:
-                    Console.WriteLine("Unknown status: %d", status);
+                    Logging.Write(string.Format ("Unknown status: %d", status));
                     break;
                        
             }

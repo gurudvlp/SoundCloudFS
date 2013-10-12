@@ -74,7 +74,7 @@ namespace btEngine
 			
 			if(this.Port < 0 || this.Port > 65535)
 			{
-				Console.WriteLine("Invalid port ({0}), choose 1 - 65535", this.Port);
+				Logging.Write(string.Format ("Invalid port ({0}), choose 1 - 65535", this.Port));
 				return;
 			}
 			
@@ -133,11 +133,11 @@ namespace btEngine
 			}
 			catch(Exception ex)
 			{
-				Console.WriteLine("btEngine: TcpListener: Save failed.");
-				Console.WriteLine(ex.Message);
+				Logging.Write("btEngine: TcpListener: Save failed.");
+				Logging.Write(ex.Message);
 								
-				Console.WriteLine("Inner Exception: {0}", (ex.InnerException).Message);
-				Console.WriteLine("Base Exception: {0}", (ex.GetBaseException()).Message);
+				Logging.Write(string.Format ("Inner Exception: {0}", (ex.InnerException).Message));
+				Logging.Write(string.Format("Base Exception: {0}", (ex.GetBaseException()).Message));
 				return false;
 			}
 			

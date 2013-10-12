@@ -59,6 +59,8 @@ namespace SoundCloudFS.FileTree
 		[XmlIgnoreAttribute()] public static int NodeTypeTree = 0;
 		[XmlIgnoreAttribute()] public static int NodeTypeSearch = 1;
 		
+		[XmlIgnoreAttribute()] public static long TotalTrackSize = 0;
+		
 		public Node ()
 		{
 			for(int enode = 0; enode < SubNodes.Length; enode++)
@@ -276,7 +278,7 @@ namespace SoundCloudFS.FileTree
 			
 			if(SearchScrape.TakeTurn())
 			{
-				//Console.Write(SearchScrape.PageText);
+				Console.Write(SearchScrape.PageText);
 				string workwith = SearchScrape.PageText;
 				workwith = workwith.Substring(workwith.IndexOf("<track>"));
 				workwith = workwith.Replace("</tracks>", "");
@@ -477,6 +479,24 @@ namespace SoundCloudFS.FileTree
 			
 			string sparm = "&user_id=" + QueryUser.ToString() + "&limit=" + QueryLimit.ToString() + "&offset=" + QueryOffset.ToString();
 			this.SearchParameters = sparm;
+		}
+		
+		public long TotalTrackBytes()
+		{
+			if(this.Tracks == null) { return 0; }
+			if(this.NodeType == SoundCloudFS.FileTree.Node.NodeTypeTree) { return 0; }
+			
+			long ttl = 0;
+			for(int et = 0; et < this.Tracks.Length; et++)
+			{
+				if(this.Tracks[et] != null)
+				{
+					if(this.Tracks[et].Filesize == 0) { ttl = ttl + this.Tracks[et].CalculateFilesize(); }
+					else { ttl = ttl + this.Tracks[et].Filesize; }
+				}
+			}
+			
+			return ttl;
 		}
 	}
 }

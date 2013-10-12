@@ -178,7 +178,7 @@ namespace Mono.Fuse.SoundCloud {
 		protected override Errno OnReadDirectory (string path, OpenedPathInfo fi,
 				out IEnumerable<DirectoryEntry> paths)
 		{
-			Console.WriteLine ("(OnReadDirectory {0})", path);
+			Logging.Write(string.Format ("(OnReadDirectory {0})", path));
 			paths = null;
 			string nodepath = SoundCloudFS.FileTree.Node.ParseNodeName(path);
 			
@@ -269,7 +269,7 @@ namespace Mono.Fuse.SoundCloud {
 
 		protected override Errno OnOpenHandle (string path, OpenedPathInfo fi)
 		{
-			Console.WriteLine (string.Format ("(OnOpen {0} Flags={1})", path, fi.OpenFlags));
+			Logging.Write(string.Format ("(OnOpen {0} Flags={1})", path, fi.OpenFlags));
 			
 			//if(fi.OpenAccess == OpenFlags.O_TRUNC & OpenFlags.O_WRONLY) { Logging.Write("File opened for truncation."); return 0; }
 			
@@ -307,7 +307,7 @@ namespace Mono.Fuse.SoundCloud {
 
 		protected override Errno OnReadHandle (string path, OpenedPathInfo fi, byte[] buf, long offset, out int bytesWritten)
 		{
-			Console.WriteLine ("(OnRead: Path {0}, buflen {1}, offset {2})", path, buf.Length, offset);
+			Logging.Write (string.Format ("(OnRead: Path {0}, buflen {1}, offset {2})", path, buf.Length, offset));
 			string nodepath = SoundCloudFS.FileTree.Node.ParseNodeName(path);
 			string trackfilename = SoundCloudFS.FileTree.Node.ParseTrackFilename(path);
 			int nodeid = SoundCloudFS.FileTree.Node.FindNode(nodepath);
@@ -374,7 +374,7 @@ namespace Mono.Fuse.SoundCloud {
 
 		protected override Errno OnGetPathExtendedAttribute (string path, string name, byte[] value, out int bytesWritten)
 		{
-			Console.WriteLine ("(OnGetPathExtendedAttribute {0}, {1}, {2})", path, name, value);
+			Logging.Write (string.Format("(OnGetPathExtendedAttribute {0}, {1}, {2})", path, name, value));
 			bytesWritten = 0;
 			if(path != "TODOFIXTHIS")
 			{
@@ -400,7 +400,7 @@ namespace Mono.Fuse.SoundCloud {
 
 		protected override Errno OnSetPathExtendedAttribute (string path, string name, byte[] value, XattrFlags flags)
 		{
-			Console.WriteLine ("(OnSetPathExtendedAttribute {0})", path);
+			Logging.Write (string.Format("(OnSetPathExtendedAttribute {0})", path));
 			if (path != "/hello") {
 				return Errno.ENOSPC;
 			}
@@ -412,7 +412,7 @@ namespace Mono.Fuse.SoundCloud {
 
 		protected override Errno OnRemovePathExtendedAttribute (string path, string name)
 		{
-			Console.WriteLine ("(OnRemovePathExtendedAttribute {0})", path);
+			Logging.Write (string.Format ("(OnRemovePathExtendedAttribute {0})", path));
 			if (path != "/hello")
 				return Errno.ENODATA;
 			lock (hello_attrs) {
@@ -425,7 +425,7 @@ namespace Mono.Fuse.SoundCloud {
 
 		protected override Errno OnListPathExtendedAttributes (string path, out string[] names)
 		{
-			Console.WriteLine ("(OnListPathExtendedAttributes {0})", path);
+			Logging.Write (string.Format("(OnListPathExtendedAttributes {0})", path));
 			if (path != "/hello") {
 				names = new string[]{};
 				return 0;

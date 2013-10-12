@@ -91,8 +91,8 @@ namespace btEngine
 				}
 				catch(Exception ex)
 				{
-					Console.WriteLine("Could not create the configuration directory.");
-					Console.WriteLine("\t{0}", ex.Message);
+					Logging.Write("Could not create the configuration directory.");
+					Logging.Write ("\t"+ex.Message);
 					Engine.ConfigPath = "";
 				}
 			}
@@ -448,6 +448,21 @@ namespace btEngine
 								FSNodes[en].DecayTracks(TimeStamp() - Config.DecayTime);
 							}
 						}
+					}
+					
+					if(FSNodes != null)
+					{
+						//	Tally up the total drive/file size.
+						long totaldata = 0;
+						for(int en = 0; en < FSNodes.Length; en++)
+						{
+							if(FSNodes[en] != null)
+							{
+								totaldata = totaldata + FSNodes[en].TotalTrackBytes();
+							}
+						}
+						
+						SoundCloudFS.FileTree.Node.TotalTrackSize = totaldata;
 					}
 				}
 				
